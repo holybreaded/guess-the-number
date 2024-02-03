@@ -36,7 +36,7 @@
     <script>
         let secretNumber;
         let attempts;
-        let maxAttempts = 8;
+        let maxAttempts;
         let score = 0;
         let history = [];
         let timer;
@@ -54,7 +54,7 @@
             const userGuess = parseInt(guessInput.value);
 
             if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
-                outputDiv.innerHTML = 'Please enter a valid number between 1 and 10.';
+                outputDiv.innerHTML = 'Please enter a valid number between 1 and 100.';
             } else {
                 if (attempts >= maxAttempts) {
                     outputDiv.innerHTML = `Game Over! The correct number was ${secretNumber}.`;
@@ -83,7 +83,7 @@
         }
 
         function resetGame() {
-            secretNumber = Math.floor(Math.random() * 10) + 1;
+            secretNumber = Math.floor(Math.random() * 99) + 1;
             attempts = 0;
             history = [];
             stopTimer();
