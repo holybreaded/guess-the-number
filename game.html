@@ -121,3 +121,146 @@
     </div>
 </body>
 </html>
+In this version, we've added:
+
+Feedback on the proximity of the guess compared to the secret number.
+A history feature displaying the user's previous guesses.
+A timer that deducts points for every 10 seconds of gameplay.
+An option to play again, which resets the game and allows the player to choose a new difficulty.
+Feel free to modify and expand on these features or add new ones to further enhance the depth of the game!
+
+User
+errors spotted: looping of attempts gives negative attempts left. incorrect first answer makes it impossible to give a correct answer
+ChatGPT
+I appreciate your feedback. Let's address the issues you've identified. I'll modify the script to ensure that the attempts do not go into negative values, and I'll also handle the case where the first guess is incorrect.
+
+html
+Copy code
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        #output {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        #history {
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Number Game</h1>
+    <p>Try to guess the number between 1 and 10:</p>
+
+    <label for="guess">Your Guess: </label>
+    <input type="number" id="guess" min="1" max="10">
+    <button onclick="checkGuess()">Submit Guess</button>
+
+    <div id="output"></div>
+    <div id="history"></div>
+
+    <script>
+        let secretNumber;
+        let attempts;
+        let maxAttempts;
+        let score = 0;
+        let history = [];
+        let timer;
+
+        function startGame(difficulty) {
+            maxAttempts = difficulty === 'hard' ? 2 : 3;
+            resetGame();
+            startTimer();
+        }
+
+        function checkGuess() {
+            const guessInput = document.getElementById('guess');
+            const outputDiv = document.getElementById('output');
+            const historyDiv = document.getElementById('history');
+            const userGuess = parseInt(guessInput.value);
+
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 10) {
+                outputDiv.innerHTML = 'Please enter a valid number between 1 and 10.';
+            } else {
+                if (attempts >= maxAttempts) {
+                    outputDiv.innerHTML = `Game Over! The correct number was ${secretNumber}.`;
+                    resetGame();
+                } else {
+                    attempts++;
+
+                    const difference = Math.abs(userGuess - secretNumber);
+
+                    if (difference === 0) {
+                        outputDiv.innerHTML = `Congratulations! You guessed the number ${secretNumber} in ${attempts} attempts.`;
+                        score += maxAttempts - attempts + 1;
+                        displayScore();
+                        resetGame();
+                    } else {
+                        const proximity = difference === 1 ? 'close' : 'far';
+                        const hint = userGuess < secretNumber ? 'higher' : 'lower';
+
+                        outputDiv.innerHTML = `Wrong guess. You're ${proximity}, try going ${hint}. ${maxAttempts - attempts} attempts left.`;
+                    }
+
+                    history.push(userGuess);
+                    displayHistory();
+                }
+            }
+        }
+
+        function resetGame() {
+            secretNumber = Math.floor(Math.random() * 10) + 1;
+            attempts = 0;
+            history = [];
+            stopTimer();
+            displayScore();
+            displayHistory();
+        }
+
+        function displayScore() {
+            const scoreDiv = document.getElementById('score');
+            scoreDiv.innerHTML = `Score: ${score}`;
+        }
+
+        function displayHistory() {
+            const historyDiv = document.getElementById('history');
+            historyDiv.innerHTML = `Guess History: ${history.join(', ')}`;
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                if (attempts < maxAttempts) {
+                    attempts++;
+                    displayScore();
+                } else {
+                    stopTimer();
+                }
+            }, 10000); // Timer ticks every 10 seconds
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+        }
+    </script>
+
+    <div>
+        <h2 id="score">Score: 0</h2>
+        <p>Choose Difficulty:</p>
+        <button onclick="startGame('easy')">Easy</button>
+        <button onclick="startGame('hard')">Hard</button>
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+</body>
+</html>
